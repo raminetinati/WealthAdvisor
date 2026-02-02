@@ -1,0 +1,364 @@
+:root {
+    --bg-dark: #0f111a;
+    --bg-panel: rgba(255, 255, 255, 0.03);
+    --border-panel: rgba(255, 255, 255, 0.08);
+    --primary-accent: #6d28d9;
+    /* Deep Purple */
+    --secondary-accent: #06b6d4;
+    /* Cyan */
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --font-family: 'Outfit', sans-serif;
+    --card-radius: 16px;
+    --transition-speed: 0.2s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.app-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 15% 50%, rgba(109, 40, 217, 0.15) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 25%);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
+}
+
+.highlight {
+    background: linear-gradient(135deg, #a78bfa 0%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Controls left/right split initially? No, let's do 3 cols or customized */
+    grid-template-areas:
+        "controls viz"
+        "levers viz";
+    grid-template-columns: 350px 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "viz"
+            "controls"
+            "levers";
+    }
+}
+
+.controls-panel {
+    grid-area: controls;
+}
+
+.levers-panel {
+    grid-area: levers;
+}
+
+.viz-panel {
+    grid-area: viz;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Glass Panel Style */
+.glass-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-panel);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: var(--text-main);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.75rem;
+}
+
+/* Inputs */
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.input-group input[type="number"] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-panel);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-family: var(--font-family);
+    margin-bottom: 0.5rem;
+    transition: var(--transition-speed);
+}
+
+.input-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--secondary-accent);
+}
+
+/* Ranges */
+input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--secondary-accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+    transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Levers */
+.slider-group {
+    margin-bottom: 1.5rem;
+}
+
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.label-row label {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.label-row .sub-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-left: 5px;
+}
+
+.value-display {
+    font-weight: 600;
+    color: var(--secondary-accent);
+    font-feature-settings: "tnum";
+}
+
+/* Chart */
+.chart-container {
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+}
+
+/* Stats */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-card h3 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 400;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+}
+
+/* Expenses Panel Styles */
+.expenses-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding-right: 5px; /* For scrollbar space */
+}
+
+/* Custom Scrollbar for list */
+.expenses-list::-webkit-scrollbar {
+    width: 6px;
+}
+.expenses-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+.expenses-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.expense-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+
+.expense-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.expense-info {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    margin-right: 1rem;
+}
+
+.ex-name {
+    color: var(--text-muted);
+}
+
+.ex-amount {
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: 0.2s;
+}
+
+.btn-delete:hover {
+    color: #ef4444; /* Red */
+}
+
+.add-expense-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.mini-input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-panel);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+}
+
+.mini-input:focus {
+    outline: none;
+    border-color: var(--secondary-accent);
+}
+
+#newExpenseName {
+    flex-grow: 1;
+}
+
+#newExpenseAmount {
+    width: 80px;
+}
+
+.btn-add {
+    background: var(--secondary-accent);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-add:hover {
+    background: #22d3ee;
+    transform: scale(1.05);
+}
