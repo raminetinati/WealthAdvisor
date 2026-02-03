@@ -18,6 +18,7 @@
         <header>
             <h1>Wealth <span class="highlight">Forecaster</span></h1>
             <p>Model your financial future with precision.</p>
+            <button id="exportBtn" class="btn-export">Export CSV</button>
         </header>
 
         <main class="dashboard-grid">
@@ -25,11 +26,15 @@
                 <h2>Financial Inputs</h2>
 
                 <div class="input-group">
-                    <label for="annualIncome">Annual Income ($) <span
-                            style="float:right; font-size: 0.8em; color: var(--secondary-accent);">Tax: <span
-                                id="taxDisplay">$0</span></span></label>
+                    <label for="annualIncome">Annual Income ($)</label>
                     <input type="number" id="annualIncome" value="120000" step="1000">
                     <input type="range" id="annualIncomeRange" min="0" max="1000000" value="120000" step="5000">
+                </div>
+
+                <div class="input-group">
+                    <label for="monthlyInvestment">Monthly Investment ($)</label>
+                    <input type="number" id="monthlyInvestment" value="3000" step="100">
+                    <input type="range" id="monthlyInvestmentRange" min="0" max="50000" value="3000" step="100">
                 </div>
 
                 <div class="input-group">
@@ -42,6 +47,37 @@
                     <label for="stockPortfolio">Stock Portfolio ($)</label>
                     <input type="number" id="stockPortfolio" value="25000" step="1000">
                     <input type="range" id="stockPortfolioRange" min="0" max="1000000" value="25000" step="5000">
+                </div>
+            </section>
+
+            <section class="tax-panel glass-panel">
+                <h2>Tax & Residency</h2>
+
+                <div class="input-group">
+                    <label for="residencyStatus">Residency Status</label>
+                    <select id="residencyStatus" class="full-select">
+                        <option value="citizen" selected>Singapore Citizen / PR (Year 3+)</option>
+                        <option value="pr2">Permanent Resident (Year 2)</option>
+                        <option value="pr1">Permanent Resident (Year 1)</option>
+                        <option value="foreigner_resident">Foreigner (Tax Resident)</option>
+                        <option value="foreigner_non_resident">Foreigner (Non-Resident)</option>
+                        <option value="director">Non-Resident Director</option>
+                    </select>
+                </div>
+
+                <div class="tax-summary">
+                    <div class="tax-row">
+                        <span>Est. Tax</span>
+                        <span id="estTaxDisplay" class="val-highlight">$0</span>
+                    </div>
+                    <div class="tax-row">
+                        <span>CPF Contribution</span>
+                        <span id="cpfDisplay" class="val-highlight">$0</span>
+                    </div>
+                    <div class="tax-row sub-row">
+                        <span>Effective Tax Rate</span>
+                        <span id="effectiveRateDisplay">0%</span>
+                    </div>
                 </div>
             </section>
 
@@ -81,6 +117,14 @@
                     <input type="range" id="annualBonus" min="0" max="50" value="10" step="1">
                 </div>
 
+                <div class="slider-group">
+                    <div class="label-row">
+                        <label for="cashInterest">Cash Interest</label>
+                        <span id="cashInterestVal" class="value-display">3.0%</span>
+                    </div>
+                    <input type="range" id="cashInterest" min="0" max="10" value="3.0" step="0.1">
+                </div>
+
                 <!-- Expenses Section -->
                 <div class="expenses-section">
                     <div class="label-row"
@@ -115,8 +159,12 @@
                         <p id="totalPrincipal" class="stat-value">$0</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Interest Earned</h3>
+                        <h3>Investment Growth</h3>
                         <p id="totalInterest" class="stat-value">$0</p>
+                    </div>
+                    <div class="stat-card highlight-card">
+                        <h3>Cash Balance (Monthly)</h3>
+                        <p id="cashBalanceDisplay" class="stat-value">$0</p>
                     </div>
                 </div>
             </section>
