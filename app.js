@@ -604,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startingCash: 300000, // Starting Cash ($)
         startingStocks: 700000, // Starting Stock Portfolio ($)
         monthlySalary: 12000, // Monthly Salary ($)
+        monthlyLivingCost: 2000, // Monthly Non-Housing Living Expenses ($)
         monthlyInvestment: 3000, // Monthly Contribution to Stocks ($)
         price: 1800000,
         residency: 'sc', // sc, spr, foreigner, fta
@@ -621,9 +622,9 @@ document.addEventListener('DOMContentLoaded', () => {
         vacancyRate: 4.0, // % (if investment)
         agentFeePct: 4.17, // % (if investment)
         altRentCost: 4200, // $/month (Strategy B Living Rent)
+        cashInterest: 3.0, // % p.a. (Risk-free cash savings yield)
         stockCagr: 8.0, // % p.a.
         stockDivYield: 2.0, // % p.a.
-        cashInterest: 3.0, // % p.a.
         simTimeline: 30 // years
     };
 
@@ -637,6 +638,9 @@ document.addEventListener('DOMContentLoaded', () => {
         propMonthlySalary: document.getElementById('propMonthlySalary'),
         propMonthlySalaryRange: document.getElementById('propMonthlySalaryRange'),
         propMonthlySalaryVal: document.getElementById('propMonthlySalaryVal'),
+        propMonthlyLivingCost: document.getElementById('propMonthlyLivingCost'),
+        propMonthlyLivingCostRange: document.getElementById('propMonthlyLivingCostRange'),
+        propMonthlyLivingCostVal: document.getElementById('propMonthlyLivingCostVal'),
         propMonthlyInvestment: document.getElementById('propMonthlyInvestment'),
         propMonthlyInvestmentRange: document.getElementById('propMonthlyInvestmentRange'),
         propMonthlyInvestmentVal: document.getElementById('propMonthlyInvestmentVal'),
@@ -697,17 +701,20 @@ document.addEventListener('DOMContentLoaded', () => {
         propTaxMonthlyDisplay: document.getElementById('propTaxMonthlyDisplay'),
         propMcstMonthlyDisplay: document.getElementById('propMcstMonthlyDisplay'),
         netMonthlyPropertyOutflowDisplay: document.getElementById('netMonthlyPropertyOutflowDisplay'),
+        strategyALivingCostDisplay: document.getElementById('strategyALivingCostDisplay'),
         strategyAStockDcaDisplay: document.getElementById('strategyAStockDcaDisplay'),
         strategyAAvailableCashDisplay: document.getElementById('strategyAAvailableCashDisplay'),
 
         strategyBTakeHomeDisplay: document.getElementById('strategyBTakeHomeDisplay'),
         strategyBStartingAumDisplay: document.getElementById('strategyBStartingAumDisplay'),
         strategyBRentDisplay: document.getElementById('strategyBRentDisplay'),
+        strategyBLivingCostDisplay: document.getElementById('strategyBLivingCostDisplay'),
         strategyBBaseDcaDisplay: document.getElementById('strategyBBaseDcaDisplay'),
         monthlyRentVsBuySavingsDisplay: document.getElementById('monthlyRentVsBuySavingsDisplay'),
-        totalStrategyBMonthlyDcaDisplay: document.getElementById('totalStrategyBMonthlyDcaDisplay'),
         strategyBAvailableCashDisplay: document.getElementById('strategyBAvailableCashDisplay'),
 
+        propCashInterest: document.getElementById('propCashInterest'),
+        propCashInterestVal: document.getElementById('propCashInterestVal'),
         stockCagr: document.getElementById('stockCagr'),
         stockCagrVal: document.getElementById('stockCagrVal'),
         stockDivYield: document.getElementById('stockDivYield'),
@@ -892,25 +899,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const monthlyCpf = annualCpf / 12;
         const monthlyTakeHome = propertyState.monthlySalary - monthlyIncomeTax - monthlyCpf;
 
-        // Base Monthly Contribution from Income
+        // Base Monthly Contribution & Living Costs
         const baseMonthlyContribution = propertyState.monthlyInvestment;
+        const monthlyLivingCost = propertyState.monthlyLivingCost;
 
-        // Strategy A Monthly Available Cash = Take-Home - Property Outflow - Base Investment
+        // Strategy A Monthly Outflow & Free Cash
         const strategyAPropertyCost = isOwnerOccupied ? totalMonthlyPropertyOutflow : (totalMonthlyPropertyOutflow - netRentalInflow);
-        const strategyAAvailableCash = monthlyTakeHome - strategyAPropertyCost - baseMonthlyContribution;
+        const strategyAFreeCashflow = monthlyTakeHome - strategyAPropertyCost - baseMonthlyContribution - monthlyLivingCost;
 
-        // Strategy B Monthly Available Cash = Take-Home - Living Rent - Base Investment
-        const strategyBAvailableCash = monthlyTakeHome - propertyState.altRentCost - baseMonthlyContribution;
+        // Strategy B Monthly Living Rent & Free Cash
+        const strategyBFreeCashflow = monthlyTakeHome - propertyState.altRentCost - baseMonthlyContribution - monthlyLivingCost;
 
-        // Monthly Rent vs Buy Cash Savings
+        // Monthly Rent vs Buy Cash Savings Differential
         const monthlyRentSavingsDiff = strategyAPropertyCost - propertyState.altRentCost;
-        const totalStrategyBMonthlyDca = baseMonthlyContribution + monthlyRentSavingsDiff;
 
         const labels = [];
         const propertyValues = [];
         const loanBalances = [];
         const propertyNetEquities = [];
         const remainingStocksData = [];
+        const remainingCashAData = [];
+        const strategyBStocksData = [];
+        const strategyBCashData = [];
         const totalPropRouteAumData = [];
         const totalStockRouteAumData = [];
         const tableRows = [];
@@ -941,6 +951,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loanBalances.push(loanAmount);
         propertyNetEquities.push(initialPropEquity);
         remainingStocksData.push(strategyAStocks);
+        remainingCashAData.push(strategyACash);
+        strategyBStocksData.push(strategyBStocks);
+        strategyBCashData.push(strategyBCash);
         totalPropRouteAumData.push(initialStrategyATotalAum);
         totalStockRouteAumData.push(initialStrategyBTotalAum);
 
@@ -950,8 +963,11 @@ document.addEventListener('DOMContentLoaded', () => {
             propertyValue: price,
             loanBalance: loanAmount,
             propertyNetEquity: initialPropEquity,
-            remainingStocks: strategyAStocks,
+            stocksA: strategyAStocks,
+            cashA: strategyACash,
             totalPropAum: initialStrategyATotalAum,
+            stocksB: strategyBStocks,
+            cashB: strategyBCash,
             totalStockAum: initialStrategyBTotalAum,
             diff: initialStrategyATotalAum - initialStrategyBTotalAum,
             winner: 'Tie'
@@ -988,25 +1004,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentLoanBalance = Math.max(0, currentLoanBalance - principalForMonth);
                 }
 
-                // Strategy A Outflow vs Strategy B Living Rent
-                let monthSavingsDiff = 0;
-
+                // Strategy A Outflows & Net Cash Flow
+                let monthPropOutflow = 0;
                 if (isOwnerOccupied) {
-                    const monthlyPropertyNetOutflow = monthMortgagePayment + monthlyPropTax + monthlyMcstAndInsurance;
-                    monthSavingsDiff = monthlyPropertyNetOutflow - propertyState.altRentCost;
+                    monthPropOutflow = monthMortgagePayment + monthlyPropTax + monthlyMcstAndInsurance;
                 } else {
-                    const monthlyPropertyNetOutflow = monthMortgagePayment + monthlyPropTax + monthlyMcstAndInsurance - netRentalInflow;
-                    monthSavingsDiff = monthlyPropertyNetOutflow;
-                    cumulativeNetRentalCashflows += (-monthlyPropertyNetOutflow);
+                    monthPropOutflow = monthMortgagePayment + monthlyPropTax + monthlyMcstAndInsurance - netRentalInflow;
+                    cumulativeNetRentalCashflows += (-monthPropOutflow);
                 }
 
-                // Grow Strategy A Liquid Assets (Cash Interest + Stocks Growth + Base Monthly Contribution from salary)
-                strategyACash = strategyACash * (1 + cashMonthlyReturn);
-                strategyAStocks = strategyAStocks * (1 + stockMonthlyReturn) + baseMonthlyContribution;
+                const monthFreeCashA = monthlyTakeHome - monthPropOutflow - baseMonthlyContribution - monthlyLivingCost;
+                const monthFreeCashB = monthlyTakeHome - propertyState.altRentCost - baseMonthlyContribution - monthlyLivingCost;
 
-                // Grow Strategy B Liquid Assets (Cash + Stocks Growth + Base Monthly Contribution + Monthly Rent Savings Diff)
-                strategyBCash = strategyBCash * (1 + cashMonthlyReturn);
-                strategyBStocks = strategyBStocks * (1 + stockMonthlyReturn) + baseMonthlyContribution + monthSavingsDiff;
+                // Strategy A Compounding:
+                // Stocks receive regular base monthly DCA
+                strategyAStocks = strategyAStocks * (1 + stockMonthlyReturn) + baseMonthlyContribution;
+                // Cash balance compounds with monthly free cashflow surplus (or deficit)
+                strategyACash = strategyACash * (1 + cashMonthlyReturn) + monthFreeCashA;
+
+                // Strategy B Compounding:
+                // Stocks receive regular base monthly DCA
+                strategyBStocks = strategyBStocks * (1 + stockMonthlyReturn) + baseMonthlyContribution;
+                // Cash balance compounds with Strategy B free cashflow surplus
+                strategyBCash = strategyBCash * (1 + cashMonthlyReturn) + monthFreeCashB;
             }
 
             totalMortgageInterestPaid += yearInterestPaid;
@@ -1020,14 +1040,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? (currentPropValue - currentLoanBalance)
                 : (currentPropValue - currentLoanBalance + cumulativeNetRentalCashflows);
 
-            // Strategy A Total AUM = Property Equity + Compounded Remaining Cash + Compounded Remaining Stocks
-            const currentTotalPropAum = currentPropNetEquity + strategyACash + strategyAStocks;
+            // Strategy A Total AUM = Property Equity + Compounded Stocks + Compounded Cash Balance
+            const currentTotalPropAum = currentPropNetEquity + strategyAStocks + strategyACash;
 
-            // Strategy B Total AUM = Compounded Cash + Compounded Stocks
-            const currentTotalStockAum = strategyBCash + strategyBStocks;
+            // Strategy B Total AUM = Compounded Stocks + Compounded Cash Balance
+            const currentTotalStockAum = strategyBStocks + strategyBCash;
 
             propertyNetEquities.push(currentPropNetEquity);
             remainingStocksData.push(strategyAStocks);
+            remainingCashAData.push(strategyACash);
+            strategyBStocksData.push(strategyBStocks);
+            strategyBCashData.push(strategyBCash);
             totalPropRouteAumData.push(currentTotalPropAum);
             totalStockRouteAumData.push(currentTotalStockAum);
 
@@ -1047,8 +1070,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 propertyValue: currentPropValue,
                 loanBalance: currentLoanBalance,
                 propertyNetEquity: currentPropNetEquity,
-                remainingStocks: strategyAStocks,
+                stocksA: strategyAStocks,
+                cashA: strategyACash,
                 totalPropAum: currentTotalPropAum,
+                stocksB: strategyBStocks,
+                cashB: strategyBCash,
                 totalStockAum: currentTotalStockAum,
                 diff: netDiff,
                 winner
@@ -1059,6 +1085,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalStockAum = totalStockRouteAumData[totalStockRouteAumData.length - 1];
         const finalPropNetEquity = propertyNetEquities[propertyNetEquities.length - 1];
         const finalStrategyAStocks = remainingStocksData[remainingStocksData.length - 1];
+        const finalStrategyACash = remainingCashAData[remainingCashAData.length - 1];
+        const finalStrategyBStocks = strategyBStocksData[strategyBStocksData.length - 1];
+        const finalStrategyBCash = strategyBCashData[strategyBCashData.length - 1];
 
         const totalSunkCosts = totalMortgageInterestPaid + totalPropertyTaxesPaid + totalMcstAndMaintPaid + bsd + absd + legalFees + (propertyState.insurance * timeline);
 
@@ -1068,6 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => {
             price,
             totalStartingAum,
             baseMonthlyContribution,
+            monthlyLivingCost,
             monthlySalary: propertyState.monthlySalary,
             monthlyIncomeTax,
             monthlyCpf,
@@ -1088,14 +1118,16 @@ document.addEventListener('DOMContentLoaded', () => {
             annualPropertyTax,
             totalMonthlyPropertyOutflow,
             strategyAPropertyCost,
-            strategyAAvailableCash,
+            strategyAFreeCashflow,
+            strategyBFreeCashflow,
             initialMonthlyRentSavings: monthlyRentSavingsDiff,
-            totalStrategyBMonthlyDca,
-            strategyBAvailableCash,
             propertyValues,
             loanBalances,
             propertyNetEquities,
             remainingStocksData,
+            remainingCashAData,
+            strategyBStocksData,
+            strategyBCashData,
             totalPropRouteAumData,
             totalStockRouteAumData,
             tableRows,
@@ -1103,6 +1135,9 @@ document.addEventListener('DOMContentLoaded', () => {
             finalStockAum,
             finalPropNetEquity,
             finalStrategyAStocks,
+            finalStrategyACash,
+            finalStrategyBStocks,
+            finalStrategyBCash,
             breakevenYear,
             totalSunkCosts,
             totalMortgageInterestPaid,
@@ -1136,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: data.labels,
                 datasets: [
                     {
-                        label: 'Strategy A: Total AUM (Buy Property + Stocks)',
+                        label: 'Strategy A: Total AUM (Buy Property)',
                         data: data.totalPropRouteAumData,
                         borderColor: '#a855f7', // Bright Purple
                         backgroundColor: gradientPropAum,
@@ -1148,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         order: 1
                     },
                     {
-                        label: 'Strategy B: Total AUM (Rent & 100% Invested)',
+                        label: 'Strategy B: Total AUM (Rent & Invest)',
                         data: data.totalStockRouteAumData,
                         borderColor: '#06b6d4', // Bright Cyan
                         backgroundColor: gradientStockAum,
@@ -1172,11 +1207,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         order: 3
                     },
                     {
-                        label: 'Strategy A: Remaining Stocks',
+                        label: 'Strategy A: Stock Portfolio',
                         data: data.remainingStocksData,
                         borderColor: '#10b981', // Emerald
                         backgroundColor: 'transparent',
-                        borderWidth: 2,
+                        borderWidth: 1.8,
                         borderDash: [3, 3],
                         tension: 0.35,
                         fill: false,
@@ -1184,16 +1219,40 @@ document.addEventListener('DOMContentLoaded', () => {
                         order: 4
                     },
                     {
-                        label: 'Remaining Mortgage Debt',
-                        data: data.loanBalances,
-                        borderColor: '#94a3b8', // Muted Slate
+                        label: 'Strategy A: Cash Savings Balance',
+                        data: data.remainingCashAData,
+                        borderColor: '#34d399', // Mint
                         backgroundColor: 'transparent',
                         borderWidth: 1.5,
                         borderDash: [2, 2],
-                        tension: 0.1,
+                        tension: 0.35,
                         fill: false,
                         pointRadius: 0,
                         order: 5
+                    },
+                    {
+                        label: 'Strategy B: Stock Portfolio',
+                        data: data.strategyBStocksData,
+                        borderColor: '#38bdf8', // Sky
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.8,
+                        borderDash: [3, 3],
+                        tension: 0.35,
+                        fill: false,
+                        pointRadius: 0,
+                        order: 6
+                    },
+                    {
+                        label: 'Strategy B: Cash Savings Balance',
+                        data: data.strategyBCashData,
+                        borderColor: '#f59e0b', // Amber
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.5,
+                        borderDash: [2, 2],
+                        tension: 0.35,
+                        fill: false,
+                        pointRadius: 0,
+                        order: 7
                     }
                 ]
             },
@@ -1207,8 +1266,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         labels: {
                             color: '#94a3b8',
                             usePointStyle: true,
-                            padding: 14,
-                            font: { family: "'Outfit', sans-serif", size: 12 }
+                            padding: 12,
+                            font: { family: "'Outfit', sans-serif", size: 11.5 }
                         }
                     },
                     tooltip: {
@@ -1284,8 +1343,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${formatCurrency(r.propertyValue)}</td>
                 <td>${formatCurrency(r.loanBalance)}</td>
                 <td style="color: #c084fc;">${formatCurrency(r.propertyNetEquity)}</td>
-                <td style="color: #10b981;">${formatCurrency(r.remainingStocks)}</td>
+                <td style="color: #10b981;">${formatCurrency(r.stocksA)}</td>
+                <td style="color: #34d399;">${formatCurrency(r.cashA)}</td>
                 <td style="color: #a855f7; font-weight: 700;">${formatCurrency(r.totalPropAum)}</td>
+                <td style="color: #38bdf8;">${formatCurrency(r.stocksB)}</td>
+                <td style="color: #f59e0b;">${formatCurrency(r.cashB)}</td>
                 <td style="color: #22d3ee; font-weight: 700;">${formatCurrency(r.totalStockAum)}</td>
                 <td class="${diffClass}">${formatCurrency(Math.abs(r.diff))} ${r.diff >= 0 ? '(A)' : '(B)'}</td>
                 <td><span class="badge-tag ${badgeClass}">${r.winner}</span></td>
@@ -1297,10 +1359,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CSV Export for Property vs Stocks ---
     function exportPropertyCSV() {
         const sim = runPropertyVsStocksSimulation();
-        let csv = 'Year,Calendar Year,Property Market Value,Remaining Mortgage Debt,Property Net Equity (Strategy A),Remaining Stocks (Strategy A),Total AUM (Strategy A: Buy),Total AUM (Strategy B: Rent & Invest),Net Difference,Leader\n';
+        let csv = 'Year,Calendar Year,Property Market Value,Remaining Mortgage Debt,Property Net Equity (A),Stocks Portfolio (A),Cash Savings Balance (A),Total AUM (Strategy A: Buy),Stocks Portfolio (B),Cash Savings Balance (B),Total AUM (Strategy B: Rent & Invest),Net Difference,Leader\n';
 
         sim.tableRows.forEach(r => {
-            csv += `${r.yearNum},${r.calendarYear},${r.propertyValue.toFixed(2)},${r.loanBalance.toFixed(2)},${r.propertyNetEquity.toFixed(2)},${r.remainingStocks.toFixed(2)},${r.totalPropAum.toFixed(2)},${r.totalStockAum.toFixed(2)},${r.diff.toFixed(2)},${r.winner}\n`;
+            csv += `${r.yearNum},${r.calendarYear},${r.propertyValue.toFixed(2)},${r.loanBalance.toFixed(2)},${r.propertyNetEquity.toFixed(2)},${r.stocksA.toFixed(2)},${r.cashA.toFixed(2)},${r.totalPropAum.toFixed(2)},${r.stocksB.toFixed(2)},${r.cashB.toFixed(2)},${r.totalStockAum.toFixed(2)},${r.diff.toFixed(2)},${r.winner}\n`;
         });
 
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -1308,7 +1370,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a');
         a.setAttribute('hidden', '');
         a.setAttribute('href', url);
-        a.setAttribute('download', 'strategy_A_vs_strategy_B_aum_comparison.csv');
+        a.setAttribute('download', 'strategy_A_vs_strategy_B_comprehensive_aum_ledger.csv');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1359,12 +1421,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (propElements.propTaxMonthlyDisplay) propElements.propTaxMonthlyDisplay.textContent = `-${formatCurrency(sim.monthlyPropTax)}/mo`;
         if (propElements.propMcstMonthlyDisplay) propElements.propMcstMonthlyDisplay.textContent = `-${formatCurrency(sim.monthlyMcstAndInsurance)}/mo`;
         if (propElements.netMonthlyPropertyOutflowDisplay) propElements.netMonthlyPropertyOutflowDisplay.textContent = `-${formatCurrency(sim.strategyAPropertyCost)}/mo`;
+        if (propElements.strategyALivingCostDisplay) propElements.strategyALivingCostDisplay.textContent = `-${formatCurrency(sim.monthlyLivingCost)}/mo`;
         if (propElements.strategyAStockDcaDisplay) propElements.strategyAStockDcaDisplay.textContent = `-${formatCurrency(sim.baseMonthlyContribution)}/mo`;
         
         if (propElements.strategyAAvailableCashDisplay) {
-            const isNeg = sim.strategyAAvailableCash < 0;
+            const isNeg = sim.strategyAFreeCashflow < 0;
             const sign = isNeg ? '-' : '+';
-            propElements.strategyAAvailableCashDisplay.textContent = `${sign}${formatCurrency(Math.abs(sim.strategyAAvailableCash))}/mo`;
+            propElements.strategyAAvailableCashDisplay.textContent = `${sign}${formatCurrency(Math.abs(sim.strategyAFreeCashflow))}/mo`;
             propElements.strategyAAvailableCashDisplay.className = isNeg ? 'val-highlight text-rose font-lg' : 'val-highlight highlight-emerald font-lg';
         }
 
@@ -1372,12 +1435,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (propElements.strategyBTakeHomeDisplay) propElements.strategyBTakeHomeDisplay.textContent = formatCurrency(sim.monthlyTakeHome) + '/mo';
         if (propElements.strategyBStartingAumDisplay) propElements.strategyBStartingAumDisplay.textContent = formatCurrency(sim.totalStartingAum);
         if (propElements.strategyBRentDisplay) propElements.strategyBRentDisplay.textContent = `-${formatCurrency(propertyState.altRentCost)}/mo`;
+        if (propElements.strategyBLivingCostDisplay) propElements.strategyBLivingCostDisplay.textContent = `-${formatCurrency(sim.monthlyLivingCost)}/mo`;
         if (propElements.strategyBBaseDcaDisplay) propElements.strategyBBaseDcaDisplay.textContent = `-${formatCurrency(sim.baseMonthlyContribution)}/mo`;
 
         if (propElements.strategyBAvailableCashDisplay) {
-            const isNeg = sim.strategyBAvailableCash < 0;
+            const isNeg = sim.strategyBFreeCashflow < 0;
             const sign = isNeg ? '-' : '+';
-            propElements.strategyBAvailableCashDisplay.textContent = `${sign}${formatCurrency(Math.abs(sim.strategyBAvailableCash))}/mo`;
+            propElements.strategyBAvailableCashDisplay.textContent = `${sign}${formatCurrency(Math.abs(sim.strategyBFreeCashflow))}/mo`;
             propElements.strategyBAvailableCashDisplay.className = isNeg ? 'val-highlight text-rose font-lg' : 'val-highlight highlight-emerald font-lg';
         }
 
@@ -1388,17 +1452,15 @@ document.addEventListener('DOMContentLoaded', () => {
             propElements.monthlyRentVsBuySavingsDisplay.className = isNegative ? 'val-highlight text-rose font-lg' : 'val-highlight text-emerald font-lg';
         }
 
-        if (propElements.totalStrategyBMonthlyDcaDisplay) {
-            propElements.totalStrategyBMonthlyDcaDisplay.textContent = formatCurrency(sim.totalStrategyBMonthlyDca) + '/mo';
-        }
-
         // Summary Top Cards
         if (propElements.finalTotalPropAumDisplay) propElements.finalTotalPropAumDisplay.textContent = formatCurrency(sim.finalTotalPropAum);
         if (propElements.finalPropEquityAndLiquidSub) {
-            propElements.finalPropEquityAndLiquidSub.textContent = `Equity: ${formatCurrency(sim.finalPropNetEquity)} | Stocks: ${formatCurrency(sim.finalStrategyAStocks)}`;
+            propElements.finalPropEquityAndLiquidSub.textContent = `Equity: ${formatCurrency(sim.finalPropNetEquity)} | Stocks: ${formatCurrency(sim.finalStrategyAStocks)} | Cash: ${formatCurrency(sim.finalStrategyACash)}`;
         }
         if (propElements.finalStockAumDisplay) propElements.finalStockAumDisplay.textContent = formatCurrency(sim.finalStockAum);
-        if (propElements.stockInvestedTotalSub) propElements.stockInvestedTotalSub.textContent = `Starting ${formatCurrency(sim.totalStartingAum)} + Base DCA (${formatCurrency(sim.baseMonthlyContribution)}/mo) + Rent Savings`;
+        if (propElements.stockInvestedTotalSub) {
+            propElements.stockInvestedTotalSub.textContent = `Stocks: ${formatCurrency(sim.finalStrategyBStocks)} | Cash Reserves: ${formatCurrency(sim.finalStrategyBCash)}`;
+        }
 
         // Winner Card
         if (propElements.winnerDisplay) {
@@ -1470,6 +1532,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bindPropertyInput('startingCash', propElements.startingCash, propElements.startingCashRange, propElements.startingCashVal, 'currency');
         bindPropertyInput('startingStocks', propElements.startingStocks, propElements.startingStocksRange, propElements.startingStocksVal, 'currency');
         bindPropertyInput('monthlySalary', propElements.propMonthlySalary, propElements.propMonthlySalaryRange, propElements.propMonthlySalaryVal, 'monthly');
+        bindPropertyInput('monthlyLivingCost', propElements.propMonthlyLivingCost, propElements.propMonthlyLivingCostRange, propElements.propMonthlyLivingCostVal, 'monthly');
         bindPropertyInput('monthlyInvestment', propElements.propMonthlyInvestment, propElements.propMonthlyInvestmentRange, propElements.propMonthlyInvestmentVal, 'monthly');
 
         bindPropertyInput('price', propElements.propPrice, propElements.propPriceRange, propElements.propPriceVal, 'currency');
@@ -1488,6 +1551,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bindPropertyInput('agentFeePct', propElements.agentFeePct, propElements.agentFeePct, propElements.agentFeePctVal, 'percent');
         bindPropertyInput('altRentCost', propElements.altRentCost, null, propElements.altRentCostVal, 'currency');
 
+        bindPropertyInput('cashInterest', propElements.propCashInterest, propElements.propCashInterest, propElements.propCashInterestVal, 'percent');
         bindPropertyInput('stockCagr', propElements.stockCagr, propElements.stockCagr, propElements.stockCagrVal, 'percent');
         bindPropertyInput('stockDivYield', propElements.stockDivYield, propElements.stockDivYield, propElements.stockDivYieldVal, 'percent');
         bindPropertyInput('simTimeline', propElements.simTimeline, propElements.simTimeline, propElements.simTimelineVal, 'years');
