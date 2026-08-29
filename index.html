@@ -244,7 +244,7 @@
                                 <span id="totalStartingAumDisplay" class="val-highlight highlight-cyan font-lg">$1,000,000</span>
                             </div>
                             <div class="tax-row">
-                                <span>Monthly Take-Home Salary (after Tax & CPF)</span>
+                                <span>Monthly Net Take-Home Salary</span>
                                 <span id="monthlyTakeHomeDisplay" class="val-highlight highlight-emerald font-lg">$9,882/mo</span>
                             </div>
                             <div class="tax-row sub-row">
@@ -268,12 +268,12 @@
                         </div>
 
                         <div class="input-group">
-                            <label for="propResidency">Residency Status (ABSD Rules)</label>
+                            <label for="propResidency">Residency Status (ABSD & CPF Rules)</label>
                             <select id="propResidency" class="full-select">
                                 <option value="sc" selected>Singapore Citizen (SC)</option>
                                 <option value="spr">Singapore Permanent Resident (SPR)</option>
-                                <option value="foreigner">Foreigner (60% ABSD)</option>
-                                <option value="fta">US / FTA Nationals (SC Treatment)</option>
+                                <option value="foreigner">Foreigner (60% ABSD / 0% CPF)</option>
+                                <option value="fta">US / FTA Nationals (SC ABSD / 0% CPF)</option>
                             </select>
                         </div>
 
@@ -446,34 +446,34 @@
 
                         <div class="tax-summary">
                             <div class="tax-row">
+                                <span>Monthly Net Take-Home Pay</span>
+                                <span id="strategyATakeHomeDisplay" class="val-highlight highlight-emerald">$9,882/mo</span>
+                            </div>
+                            <div class="tax-row">
                                 <span>Monthly Mortgage Payment</span>
-                                <span id="monthlyMortgageDisplay" class="val-highlight highlight-cyan">$6,062/mo</span>
+                                <span id="monthlyMortgageDisplay" class="val-highlight highlight-cyan">-$6,062/mo</span>
                             </div>
                             <div class="tax-row">
                                 <span>Monthly IRAS Property Tax</span>
-                                <span id="propTaxMonthlyDisplay" class="val-highlight">$133/mo</span>
+                                <span id="propTaxMonthlyDisplay" class="val-highlight">-$133/mo</span>
                             </div>
                             <div class="tax-row">
-                                <span>Monthly MCST & Maintenance</span>
-                                <span id="propMcstMonthlyDisplay" class="val-highlight">$550/mo</span>
+                                <span>Monthly MCST, Maint. & Insurance</span>
+                                <span id="propMcstMonthlyDisplay" class="val-highlight">-$575/mo</span>
                             </div>
                             <div class="tax-row sub-row">
-                                <span>Total Strategy A Housing Outflow</span>
-                                <span id="netMonthlyPropertyOutflowDisplay" class="val-highlight highlight-purple font-lg">$6,745/mo</span>
-                            </div>
-                            <div class="tax-row">
-                                <span>Monthly Income Tax to Pay</span>
-                                <span id="strategyAIncomeTaxDisplay" class="val-highlight text-rose">$759/mo</span>
+                                <span>Total Strategy A Housing Cost</span>
+                                <span id="netMonthlyPropertyOutflowDisplay" class="val-highlight highlight-purple font-lg">-$6,771/mo</span>
                             </div>
                             <div class="tax-row">
                                 <span>Monthly Stock Investment</span>
-                                <span id="strategyAStockDcaDisplay" class="val-highlight highlight-emerald">$3,000/mo</span>
+                                <span id="strategyAStockDcaDisplay" class="val-highlight highlight-emerald">-$3,000/mo</span>
                             </div>
                             <div class="tax-row sub-row available-cash-row">
                                 <span>Strategy A Available Monthly Cash</span>
-                                <span id="strategyAAvailableCashDisplay" class="val-highlight highlight-emerald font-lg">+$137/mo</span>
+                                <span id="strategyAAvailableCashDisplay" class="val-highlight highlight-emerald font-lg">+$111/mo</span>
                             </div>
-                            <span class="sub-label">Cash remaining from your salary after paying Income Tax, CPF, Property Expenses & Monthly Stock Investment.</span>
+                            <span class="sub-label">Remaining unallocated cash from salary after paying Tax, CPF, Property Costs & Stock Investment.</span>
                         </div>
                     </section>
 
@@ -516,30 +516,30 @@
 
                         <div class="tax-summary strategy-b-summary">
                             <div class="tax-row">
+                                <span>Monthly Net Take-Home Pay</span>
+                                <span id="strategyBTakeHomeDisplay" class="val-highlight highlight-emerald">$9,882/mo</span>
+                            </div>
+                            <div class="tax-row">
                                 <span>Monthly Living Rent</span>
-                                <span id="strategyBRentDisplay" class="val-highlight highlight-cyan font-lg">$4,200/mo</span>
+                                <span id="strategyBRentDisplay" class="val-highlight highlight-cyan font-lg">-$4,200/mo</span>
                             </div>
                             <div class="tax-row">
-                                <span>Monthly Income Tax to Pay</span>
-                                <span id="strategyBIncomeTaxDisplay" class="val-highlight text-rose font-lg">$759/mo</span>
-                            </div>
-                            <div class="tax-row">
-                                <span>Monthly Base Investment from Salary</span>
-                                <span id="strategyBBaseDcaDisplay" class="val-highlight">$3,000/mo</span>
-                            </div>
-                            <div class="tax-row">
-                                <span>Rent vs. Buy Monthly Savings (Invested)</span>
-                                <span id="monthlyRentVsBuySavingsDisplay" class="val-highlight text-emerald font-lg">+$2,545/mo</span>
-                            </div>
-                            <div class="tax-row sub-row">
-                                <span>Total Strategy B Monthly Stock DCA</span>
-                                <span id="totalStrategyBMonthlyDcaDisplay" class="val-highlight highlight-cyan font-lg">$5,545/mo</span>
+                                <span>Monthly Base Stock Investment</span>
+                                <span id="strategyBBaseDcaDisplay" class="val-highlight highlight-emerald">-$3,000/mo</span>
                             </div>
                             <div class="tax-row sub-row available-cash-row">
                                 <span>Strategy B Available Monthly Cash</span>
-                                <span id="strategyBAvailableCashDisplay" class="val-highlight highlight-emerald font-lg">+$137/mo</span>
+                                <span id="strategyBAvailableCashDisplay" class="val-highlight highlight-emerald font-lg">+$2,682/mo</span>
                             </div>
-                            <span class="sub-label">Cash remaining from salary after paying Income Tax, CPF, Living Rent & Total Stock DCA ($5,545/mo).</span>
+                            <div class="tax-row sub-row">
+                                <span>Rent vs. Buy Monthly Cash Savings</span>
+                                <span id="monthlyRentVsBuySavingsDisplay" class="val-highlight text-emerald font-lg">+$2,571/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Total Strategy B Stock DCA (with savings)</span>
+                                <span id="totalStrategyBMonthlyDcaDisplay" class="val-highlight highlight-cyan font-lg">$5,571/mo</span>
+                            </div>
+                            <span class="sub-label">You have $2,682/mo available cash after rent and base investment. In our AUM model, the $2,571/mo rent savings is DCA'd into stocks!</span>
                         </div>
                     </section>
                 </div>

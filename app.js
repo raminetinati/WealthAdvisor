@@ -672,7 +672,6 @@ document.addEventListener('DOMContentLoaded', () => {
         remainingStocksDisplay: document.getElementById('remainingStocksDisplay'),
         shortfallWarning: document.getElementById('shortfallWarning'),
         shortfallAmtDisplay: document.getElementById('shortfallAmtDisplay'),
-        monthlyMortgageDisplay: document.getElementById('monthlyMortgageDisplay'),
 
         propAv: document.getElementById('propAv'),
         propAvVal: document.getElementById('propAvVal'),
@@ -693,12 +692,21 @@ document.addEventListener('DOMContentLoaded', () => {
         altRentCost: document.getElementById('altRentCost'),
         altRentCostVal: document.getElementById('altRentCostVal'),
 
+        strategyATakeHomeDisplay: document.getElementById('strategyATakeHomeDisplay'),
+        monthlyMortgageDisplay: document.getElementById('monthlyMortgageDisplay'),
         propTaxMonthlyDisplay: document.getElementById('propTaxMonthlyDisplay'),
         propMcstMonthlyDisplay: document.getElementById('propMcstMonthlyDisplay'),
         netMonthlyPropertyOutflowDisplay: document.getElementById('netMonthlyPropertyOutflowDisplay'),
-        strategyAIncomeTaxDisplay: document.getElementById('strategyAIncomeTaxDisplay'),
         strategyAStockDcaDisplay: document.getElementById('strategyAStockDcaDisplay'),
         strategyAAvailableCashDisplay: document.getElementById('strategyAAvailableCashDisplay'),
+
+        strategyBTakeHomeDisplay: document.getElementById('strategyBTakeHomeDisplay'),
+        strategyBStartingAumDisplay: document.getElementById('strategyBStartingAumDisplay'),
+        strategyBRentDisplay: document.getElementById('strategyBRentDisplay'),
+        strategyBBaseDcaDisplay: document.getElementById('strategyBBaseDcaDisplay'),
+        monthlyRentVsBuySavingsDisplay: document.getElementById('monthlyRentVsBuySavingsDisplay'),
+        totalStrategyBMonthlyDcaDisplay: document.getElementById('totalStrategyBMonthlyDcaDisplay'),
+        strategyBAvailableCashDisplay: document.getElementById('strategyBAvailableCashDisplay'),
 
         stockCagr: document.getElementById('stockCagr'),
         stockCagrVal: document.getElementById('stockCagrVal'),
@@ -706,14 +714,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stockDivYieldVal: document.getElementById('stockDivYieldVal'),
         simTimeline: document.getElementById('simTimeline'),
         simTimelineVal: document.getElementById('simTimelineVal'),
-
-        strategyBStartingAumDisplay: document.getElementById('strategyBStartingAumDisplay'),
-        strategyBRentDisplay: document.getElementById('strategyBRentDisplay'),
-        strategyBIncomeTaxDisplay: document.getElementById('strategyBIncomeTaxDisplay'),
-        strategyBBaseDcaDisplay: document.getElementById('strategyBBaseDcaDisplay'),
-        monthlyRentVsBuySavingsDisplay: document.getElementById('monthlyRentVsBuySavingsDisplay'),
-        totalStrategyBMonthlyDcaDisplay: document.getElementById('totalStrategyBMonthlyDcaDisplay'),
-        strategyBAvailableCashDisplay: document.getElementById('strategyBAvailableCashDisplay'),
 
         finalTotalPropAumDisplay: document.getElementById('finalTotalPropAumDisplay'),
         finalPropEquityAndLiquidSub: document.getElementById('finalPropEquityAndLiquidSub'),
@@ -877,9 +877,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const annualPropertyTax = calculatePropertyTax(propertyState.av, isOwnerOccupied);
 
         const monthlyPropTax = annualPropertyTax / 12;
-        const monthlyMcstAndMaint = propertyState.mcst + propertyState.maintenance;
-        const monthlyHoldingCosts = monthlyMcstAndMaint + monthlyPropTax + (propertyState.insurance / 12);
-        const totalMonthlyPropertyOutflow = monthlyMortgage + monthlyHoldingCosts;
+        const monthlyMcstAndInsurance = propertyState.mcst + propertyState.maintenance + (propertyState.insurance / 12);
+        const totalMonthlyPropertyOutflow = monthlyMortgage + monthlyPropTax + monthlyMcstAndInsurance;
 
         // Rental vs Alternative Living Rent
         const grossMonthlyRent = propertyState.rentalIncome;
@@ -896,18 +895,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Base Monthly Contribution from Income
         const baseMonthlyContribution = propertyState.monthlyInvestment;
 
-        // Strategy A Monthly Available Cash
-        const strategyAAvailableCash = monthlyTakeHome - totalMonthlyPropertyOutflow - baseMonthlyContribution;
+        // Strategy A Monthly Available Cash = Take-Home - Property Outflow - Base Investment
+        const strategyAPropertyCost = isOwnerOccupied ? totalMonthlyPropertyOutflow : (totalMonthlyPropertyOutflow - netRentalInflow);
+        const strategyAAvailableCash = monthlyTakeHome - strategyAPropertyCost - baseMonthlyContribution;
 
-        // Initial monthly Rent-vs-Buy Savings difference
-        const initialMonthlyRentSavings = isOwnerOccupied 
-            ? (totalMonthlyPropertyOutflow - propertyState.altRentCost)
-            : (totalMonthlyPropertyOutflow - netRentalInflow);
+        // Strategy B Monthly Available Cash = Take-Home - Living Rent - Base Investment
+        const strategyBAvailableCash = monthlyTakeHome - propertyState.altRentCost - baseMonthlyContribution;
 
-        const totalStrategyBMonthlyDca = baseMonthlyContribution + initialMonthlyRentSavings;
-
-        // Strategy B Monthly Available Cash
-        const strategyBAvailableCash = monthlyTakeHome - propertyState.altRentCost - totalStrategyBMonthlyDca;
+        // Monthly Rent vs Buy Cash Savings
+        const monthlyRentSavingsDiff = strategyAPropertyCost - propertyState.altRentCost;
+        const totalStrategyBMonthlyDca = baseMonthlyContribution + monthlyRentSavingsDiff;
 
         const labels = [];
         const propertyValues = [];
@@ -992,14 +989,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Strategy A Outflow vs Strategy B Living Rent
-                let monthlyRentSavingsDiff = 0;
+                let monthSavingsDiff = 0;
 
                 if (isOwnerOccupied) {
-                    const monthlyPropertyNetOutflow = monthMortgagePayment + monthlyHoldingCosts;
-                    monthlyRentSavingsDiff = monthlyPropertyNetOutflow - propertyState.altRentCost;
+                    const monthlyPropertyNetOutflow = monthMortgagePayment + monthlyPropTax + monthlyMcstAndInsurance;
+                    monthSavingsDiff = monthlyPropertyNetOutflow - propertyState.altRentCost;
                 } else {
-                    const monthlyPropertyNetOutflow = monthMortgagePayment + monthlyHoldingCosts - netRentalInflow;
-                    monthlyRentSavingsDiff = monthlyPropertyNetOutflow;
+                    const monthlyPropertyNetOutflow = monthMortgagePayment + monthlyPropTax + monthlyMcstAndInsurance - netRentalInflow;
+                    monthSavingsDiff = monthlyPropertyNetOutflow;
                     cumulativeNetRentalCashflows += (-monthlyPropertyNetOutflow);
                 }
 
@@ -1009,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Grow Strategy B Liquid Assets (Cash + Stocks Growth + Base Monthly Contribution + Monthly Rent Savings Diff)
                 strategyBCash = strategyBCash * (1 + cashMonthlyReturn);
-                strategyBStocks = strategyBStocks * (1 + stockMonthlyReturn) + baseMonthlyContribution + monthlyRentSavingsDiff;
+                strategyBStocks = strategyBStocks * (1 + stockMonthlyReturn) + baseMonthlyContribution + monthSavingsDiff;
             }
 
             totalMortgageInterestPaid += yearInterestPaid;
@@ -1087,12 +1084,12 @@ document.addEventListener('DOMContentLoaded', () => {
             totalShortfall,
             monthlyMortgage,
             monthlyPropTax,
-            monthlyMcstAndMaint,
+            monthlyMcstAndInsurance,
             annualPropertyTax,
-            monthlyHoldingCosts,
             totalMonthlyPropertyOutflow,
+            strategyAPropertyCost,
             strategyAAvailableCash,
-            initialMonthlyRentSavings,
+            initialMonthlyRentSavings: monthlyRentSavingsDiff,
             totalStrategyBMonthlyDca,
             strategyBAvailableCash,
             propertyValues,
@@ -1357,12 +1354,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Box 4: Strategy A Property Expenses & Cash Flow
-        if (propElements.monthlyMortgageDisplay) propElements.monthlyMortgageDisplay.textContent = formatCurrency(sim.monthlyMortgage) + '/mo';
-        if (propElements.propTaxMonthlyDisplay) propElements.propTaxMonthlyDisplay.textContent = formatCurrency(sim.monthlyPropTax) + '/mo';
-        if (propElements.propMcstMonthlyDisplay) propElements.propMcstMonthlyDisplay.textContent = formatCurrency(sim.monthlyMcstAndMaint) + '/mo';
-        if (propElements.netMonthlyPropertyOutflowDisplay) propElements.netMonthlyPropertyOutflowDisplay.textContent = formatCurrency(sim.totalMonthlyPropertyOutflow) + '/mo';
-        if (propElements.strategyAIncomeTaxDisplay) propElements.strategyAIncomeTaxDisplay.textContent = formatCurrency(sim.monthlyIncomeTax) + '/mo';
-        if (propElements.strategyAStockDcaDisplay) propElements.strategyAStockDcaDisplay.textContent = formatCurrency(sim.baseMonthlyContribution) + '/mo';
+        if (propElements.strategyATakeHomeDisplay) propElements.strategyATakeHomeDisplay.textContent = formatCurrency(sim.monthlyTakeHome) + '/mo';
+        if (propElements.monthlyMortgageDisplay) propElements.monthlyMortgageDisplay.textContent = `-${formatCurrency(sim.monthlyMortgage)}/mo`;
+        if (propElements.propTaxMonthlyDisplay) propElements.propTaxMonthlyDisplay.textContent = `-${formatCurrency(sim.monthlyPropTax)}/mo`;
+        if (propElements.propMcstMonthlyDisplay) propElements.propMcstMonthlyDisplay.textContent = `-${formatCurrency(sim.monthlyMcstAndInsurance)}/mo`;
+        if (propElements.netMonthlyPropertyOutflowDisplay) propElements.netMonthlyPropertyOutflowDisplay.textContent = `-${formatCurrency(sim.strategyAPropertyCost)}/mo`;
+        if (propElements.strategyAStockDcaDisplay) propElements.strategyAStockDcaDisplay.textContent = `-${formatCurrency(sim.baseMonthlyContribution)}/mo`;
         
         if (propElements.strategyAAvailableCashDisplay) {
             const isNeg = sim.strategyAAvailableCash < 0;
@@ -1372,10 +1369,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Box 5: Strategy B Rent & Cash Flow
+        if (propElements.strategyBTakeHomeDisplay) propElements.strategyBTakeHomeDisplay.textContent = formatCurrency(sim.monthlyTakeHome) + '/mo';
         if (propElements.strategyBStartingAumDisplay) propElements.strategyBStartingAumDisplay.textContent = formatCurrency(sim.totalStartingAum);
-        if (propElements.strategyBRentDisplay) propElements.strategyBRentDisplay.textContent = formatCurrency(propertyState.altRentCost) + '/mo';
-        if (propElements.strategyBIncomeTaxDisplay) propElements.strategyBIncomeTaxDisplay.textContent = formatCurrency(sim.monthlyIncomeTax) + '/mo';
-        if (propElements.strategyBBaseDcaDisplay) propElements.strategyBBaseDcaDisplay.textContent = formatCurrency(sim.baseMonthlyContribution) + '/mo';
+        if (propElements.strategyBRentDisplay) propElements.strategyBRentDisplay.textContent = `-${formatCurrency(propertyState.altRentCost)}/mo`;
+        if (propElements.strategyBBaseDcaDisplay) propElements.strategyBBaseDcaDisplay.textContent = `-${formatCurrency(sim.baseMonthlyContribution)}/mo`;
+
+        if (propElements.strategyBAvailableCashDisplay) {
+            const isNeg = sim.strategyBAvailableCash < 0;
+            const sign = isNeg ? '-' : '+';
+            propElements.strategyBAvailableCashDisplay.textContent = `${sign}${formatCurrency(Math.abs(sim.strategyBAvailableCash))}/mo`;
+            propElements.strategyBAvailableCashDisplay.className = isNeg ? 'val-highlight text-rose font-lg' : 'val-highlight highlight-emerald font-lg';
+        }
 
         if (propElements.monthlyRentVsBuySavingsDisplay) {
             const isNegative = sim.initialMonthlyRentSavings < 0;
@@ -1386,13 +1390,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (propElements.totalStrategyBMonthlyDcaDisplay) {
             propElements.totalStrategyBMonthlyDcaDisplay.textContent = formatCurrency(sim.totalStrategyBMonthlyDca) + '/mo';
-        }
-
-        if (propElements.strategyBAvailableCashDisplay) {
-            const isNeg = sim.strategyBAvailableCash < 0;
-            const sign = isNeg ? '-' : '+';
-            propElements.strategyBAvailableCashDisplay.textContent = `${sign}${formatCurrency(Math.abs(sim.strategyBAvailableCash))}/mo`;
-            propElements.strategyBAvailableCashDisplay.className = isNeg ? 'val-highlight text-rose font-lg' : 'val-highlight highlight-emerald font-lg';
         }
 
         // Summary Top Cards
