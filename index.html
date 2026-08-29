@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wealth Forecaster</title>
+    <title>WealthAdvisor - Wealth & Singapore Property Forecaster</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,159 +16,619 @@
     <div class="app-background"></div>
     <div class="container">
         <header>
-            <h1>Wealth <span class="highlight">Forecaster</span></h1>
-            <p>Model your financial future with precision.</p>
-            <button id="exportBtn" class="btn-export">Export CSV</button>
+            <h1>Wealth <span class="highlight">Advisor</span></h1>
+            <p>Plan your wealth trajectory & evaluate Singapore property investments with precision.</p>
+            
+            <!-- Navigation Tabs -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="wealth-tab" id="tabBtnWealth">
+                    <span class="tab-icon">📈</span> Wealth Forecaster
+                </button>
+                <button class="tab-btn" data-tab="property-tab" id="tabBtnProperty">
+                    <span class="tab-icon">🏠</span> Property vs. Stocks (SG)
+                </button>
+            </nav>
         </header>
 
-        <main class="dashboard-grid">
-            <section class="controls-panel glass-panel">
-                <h2>Financial Inputs</h2>
+        <!-- ================= TAB 1: WEALTH FORECASTER ================= -->
+        <div id="wealth-tab" class="tab-pane active">
+            <div class="tab-header-actions">
+                <span class="tab-subtitle">20-Year Income, Savings, Tax & Investment Trajectory</span>
+                <button id="exportBtn" class="btn-export">Export CSV</button>
+            </div>
 
-                <div class="input-group">
-                    <label for="annualIncome">Annual Income ($)</label>
-                    <input type="number" id="annualIncome" value="120000" step="1000">
-                    <input type="range" id="annualIncomeRange" min="0" max="1000000" value="120000" step="5000">
+            <main class="dashboard-grid">
+                <section class="controls-panel glass-panel">
+                    <h2>Financial Inputs</h2>
+
+                    <div class="input-group">
+                        <label for="annualIncome">Annual Income ($)</label>
+                        <input type="number" id="annualIncome" value="120000" step="1000">
+                        <input type="range" id="annualIncomeRange" min="0" max="1000000" value="120000" step="5000">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="monthlyInvestment">Monthly Investment ($)</label>
+                        <input type="number" id="monthlyInvestment" value="3000" step="100">
+                        <input type="range" id="monthlyInvestmentRange" min="0" max="50000" value="3000" step="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="currentSavings">Current Savings ($)</label>
+                        <input type="number" id="currentSavings" value="50000" step="1000">
+                        <input type="range" id="currentSavingsRange" min="0" max="1000000" value="50000" step="5000">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="stockPortfolio">Stock Portfolio ($)</label>
+                        <input type="number" id="stockPortfolio" value="25000" step="1000">
+                        <input type="range" id="stockPortfolioRange" min="0" max="1000000" value="25000" step="5000">
+                    </div>
+                </section>
+
+                <section class="tax-panel glass-panel">
+                    <h2>Tax & Residency</h2>
+
+                    <div class="input-group">
+                        <label for="residencyStatus">Residency Status</label>
+                        <select id="residencyStatus" class="full-select">
+                            <option value="citizen" selected>Singapore Citizen / PR (Year 3+)</option>
+                            <option value="pr2">Permanent Resident (Year 2)</option>
+                            <option value="pr1">Permanent Resident (Year 1)</option>
+                            <option value="foreigner_resident">Foreigner (Tax Resident)</option>
+                            <option value="foreigner_non_resident">Foreigner (Non-Resident)</option>
+                            <option value="director">Non-Resident Director</option>
+                        </select>
+                    </div>
+
+                    <div class="tax-summary">
+                        <div class="tax-row">
+                            <span>Est. Tax</span>
+                            <span id="estTaxDisplay" class="val-highlight">$0</span>
+                        </div>
+                        <div class="tax-row">
+                            <span>CPF Contribution</span>
+                            <span id="cpfDisplay" class="val-highlight">$0</span>
+                        </div>
+                        <div class="tax-row sub-row">
+                            <span>Effective Tax Rate</span>
+                            <span id="effectiveRateDisplay">0%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="levers-panel glass-panel">
+                    <h2>Growth Levers</h2>
+
+                    <div class="slider-group">
+                        <div class="label-row">
+                            <label for="stockReturn">Stock Appreciation</label>
+                            <span id="stockReturnVal" class="value-display">7.0%</span>
+                        </div>
+                        <input type="range" id="stockReturn" min="-10" max="20" value="7.0" step="0.1">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="label-row">
+                            <label for="dividendYield">Dividend Yield</label>
+                            <span id="dividendYieldVal" class="value-display">1.5%</span>
+                        </div>
+                        <input type="range" id="dividendYield" min="0" max="10" value="1.5" step="0.1">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="label-row">
+                            <label for="annualRaise">Annual Raise</label>
+                            <span id="annualRaiseVal" class="value-display">3.0%</span>
+                        </div>
+                        <input type="range" id="annualRaise" min="0" max="15" value="3.0" step="0.1">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="label-row">
+                            <label for="annualBonus">Annual Bonus</label>
+                            <span class="sub-label">(% of Income)</span>
+                            <span id="annualBonusVal" class="value-display">10%</span>
+                        </div>
+                        <input type="range" id="annualBonus" min="0" max="50" value="10" step="1">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="label-row">
+                            <label for="cashInterest">Cash Interest</label>
+                            <span id="cashInterestVal" class="value-display">3.0%</span>
+                        </div>
+                        <input type="range" id="cashInterest" min="0" max="10" value="3.0" step="0.1">
+                    </div>
+
+                    <!-- Expenses Section -->
+                    <div class="expenses-section">
+                        <div class="label-row"
+                            style="margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+                            <label>Monthly Expenses</label>
+                            <span id="totalExpensesDisplay" class="value-display">$0/mo</span>
+                        </div>
+
+                        <div id="expensesList" class="expenses-list">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <div class="add-expense-row">
+                            <input type="text" id="newExpenseName" placeholder="Name" class="mini-input">
+                            <input type="number" id="newExpenseAmount" placeholder="$" class="mini-input">
+                            <button id="addExpenseBtn" class="btn-add">+</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="viz-panel glass-panel">
+                    <div class="chart-container">
+                        <canvas id="wealthChart"></canvas>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <h3>Net Worth (10Y)</h3>
+                            <p id="netWorth10y" class="stat-value">$0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Saved</h3>
+                            <p id="totalPrincipal" class="stat-value">$0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Investment Growth</h3>
+                            <p id="totalInterest" class="stat-value">$0</p>
+                        </div>
+                        <div class="stat-card highlight-card">
+                            <h3>Cash Balance (Monthly)</h3>
+                            <p id="cashBalanceDisplay" class="stat-value">$0</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- ================= TAB 2: PROPERTY VS STOCKS (SG) ================= -->
+        <div id="property-tab" class="tab-pane">
+            <div class="tab-header-actions">
+                <span class="tab-subtitle">Compare Total AUM Growth: Strategy A (Buy Property with Cash/Stocks) vs. Strategy B (Rent & 100% Invested)</span>
+                <button id="exportPropertyCsvBtn" class="btn-export">Export Comparison CSV</button>
+            </div>
+
+            <main class="property-dashboard-grid">
+                <!-- Column 1: Starting Assets, Monthly Salary/Savings & Strategy A Property Purchase -->
+                <div class="prop-col">
+                    <!-- Starting Liquid Assets & Monthly Income/Savings Engine -->
+                    <section class="glass-panel">
+                        <h2>1. Starting Assets & Monthly Income</h2>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="startingCash">Starting Cash ($)</label>
+                                <span id="startingCashVal" class="value-display">$300,000</span>
+                            </div>
+                            <input type="number" id="startingCash" value="300000" step="25000">
+                            <input type="range" id="startingCashRange" min="0" max="3000000" value="300000" step="25000">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="startingStocks">Starting Stock Portfolio ($)</label>
+                                <span id="startingStocksVal" class="value-display">$700,000</span>
+                            </div>
+                            <input type="number" id="startingStocks" value="700000" step="25000">
+                            <input type="range" id="startingStocksRange" min="0" max="5000000" value="700000" step="25000">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="propMonthlySalary">Average Monthly Salary / Gross Income ($)</label>
+                                <span id="propMonthlySalaryVal" class="value-display">$12,000/mo</span>
+                            </div>
+                            <input type="number" id="propMonthlySalary" value="12000" step="500">
+                            <input type="range" id="propMonthlySalaryRange" min="2000" max="60000" value="12000" step="500">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="propMonthlyInvestment">Monthly Contribution to Stocks ($/mo)</label>
+                                <span id="propMonthlyInvestmentVal" class="value-display">$3,000/mo</span>
+                            </div>
+                            <input type="number" id="propMonthlyInvestment" value="3000" step="100">
+                            <input type="range" id="propMonthlyInvestmentRange" min="0" max="25000" value="3000" step="100">
+                            <span class="sub-label">Base monthly savings invested into stocks from your income to grow your wealth.</span>
+                        </div>
+
+                        <div class="tax-summary starting-aum-summary">
+                            <div class="tax-row">
+                                <span>Total Starting AUM</span>
+                                <span id="totalStartingAumDisplay" class="val-highlight highlight-cyan font-lg">$1,000,000</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly Take-Home Salary (after Tax & CPF)</span>
+                                <span id="monthlyTakeHomeDisplay" class="val-highlight highlight-emerald font-lg">$9,882/mo</span>
+                            </div>
+                            <div class="tax-row sub-row">
+                                <span>Monthly Income Tax & CPF</span>
+                                <span id="monthlySalaryTaxCpfDisplay" class="val-highlight">Tax: $759/mo | CPF: $1,360/mo</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Strategy A Property Acquisition -->
+                    <section class="glass-panel">
+                        <h2>2. Strategy A: Property Purchase</h2>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="propPrice">Property Purchase Price ($)</label>
+                                <span id="propPriceVal" class="value-display">$1,800,000</span>
+                            </div>
+                            <input type="number" id="propPrice" value="1800000" step="50000">
+                            <input type="range" id="propPriceRange" min="500000" max="8000000" value="1800000" step="50000">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="propResidency">Residency Status (ABSD Rules)</label>
+                            <select id="propResidency" class="full-select">
+                                <option value="sc" selected>Singapore Citizen (SC)</option>
+                                <option value="spr">Singapore Permanent Resident (SPR)</option>
+                                <option value="foreigner">Foreigner (60% ABSD)</option>
+                                <option value="fta">US / FTA Nationals (SC Treatment)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="propCount">Property Count (Number of Owned Properties)</label>
+                            <select id="propCount" class="full-select">
+                                <option value="1" selected>1st Residential Property</option>
+                                <option value="2">2nd Residential Property</option>
+                                <option value="3">3rd or Subsequent Property</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Property Usage</label>
+                            <div class="segmented-control">
+                                <button type="button" class="segment-btn active" id="btnUsageOwnStay" data-usage="own_stay">Own Stay (Lives in Property)</button>
+                                <button type="button" class="segment-btn" id="btnUsageInvestment" data-usage="investment">Investment (Rented Out)</button>
+                            </div>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propGrowthRate">Property Appreciation (% p.a.)</label>
+                                <span id="propGrowthRateVal" class="value-display">3.0%</span>
+                            </div>
+                            <input type="range" id="propGrowthRate" min="-2.0" max="10.0" value="3.0" step="0.1">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propLtv">Loan-to-Value (LTV)</label>
+                                <span id="propLtvVal" class="value-display">75%</span>
+                            </div>
+                            <input type="range" id="propLtv" min="20" max="75" value="75" step="5">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propLoanTenure">Loan Tenure (Years)</label>
+                                <span id="propLoanTenureVal" class="value-display">30 Years</span>
+                            </div>
+                            <input type="range" id="propLoanTenure" min="5" max="35" value="30" step="1">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propInterestRate">Mortgage Interest Rate (% p.a.)</label>
+                                <span id="propInterestRateVal" class="value-display">3.5%</span>
+                            </div>
+                            <input type="range" id="propInterestRate" min="1.0" max="8.0" value="3.5" step="0.1">
+                        </div>
+                    </section>
+
+                    <!-- Funding Waterfall & Capital Liquidation Card -->
+                    <section class="glass-panel">
+                        <h2>3. Strategy A: Asset Liquidation & Capital Outlay</h2>
+
+                        <div class="cost-summary-box">
+                            <div class="cost-summary-title">Upfront Outlay Breakdown</div>
+                            <div class="tax-row">
+                                <span>Downpayment (<span id="downpaymentPctDisplay">25%</span>)</span>
+                                <span id="downpaymentDisplay" class="val-highlight">$450,000</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Buyer's Stamp Duty (BSD)</span>
+                                <span id="bsdDisplay" class="val-highlight">$59,600</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Additional BSD (ABSD)</span>
+                                <span id="absdDisplay" class="val-highlight">$0</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Legal & Valuation Fees</span>
+                                <span class="val-highlight">$3,000</span>
+                            </div>
+                            <div class="tax-row sub-row total-upfront-row">
+                                <span>Total Property Purchase Outlay</span>
+                                <span id="totalUpfrontDisplay" class="val-highlight highlight-purple font-lg">$512,600</span>
+                            </div>
+                        </div>
+
+                        <div class="cost-summary-box funding-waterfall-box">
+                            <div class="cost-summary-title">Funding Waterfall (Cash First, Then Sell Stocks)</div>
+                            <div class="tax-row">
+                                <span>💵 Cash Used for Purchase</span>
+                                <span id="cashUsedDisplay" class="val-highlight text-emerald">-$300,000</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>📈 Stocks Sold for Purchase</span>
+                                <span id="stocksSoldDisplay" class="val-highlight text-rose">-$212,600</span>
+                            </div>
+                            <div class="tax-row sub-row remaining-liquid-row">
+                                <span>Remaining Cash (compounds in savings)</span>
+                                <span id="remainingCashDisplay" class="val-highlight">$0</span>
+                            </div>
+                            <div class="tax-row remaining-liquid-row">
+                                <span>Remaining Stocks (compounds in portfolio)</span>
+                                <span id="remainingStocksDisplay" class="val-highlight highlight-emerald font-lg">$487,400</span>
+                            </div>
+                            <div id="shortfallWarning" class="shortfall-badge hidden">
+                                ⚠️ Starting assets are less than upfront property outlay ($<span id="shortfallAmtDisplay">0</span> shortfall).
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <div class="input-group">
-                    <label for="monthlyInvestment">Monthly Investment ($)</label>
-                    <input type="number" id="monthlyInvestment" value="3000" step="100">
-                    <input type="range" id="monthlyInvestmentRange" min="0" max="50000" value="3000" step="100">
+                <!-- Column 2: Holding Costs, Strategy B Rental & Stocks Alternative Levers -->
+                <div class="prop-col">
+                    <!-- Strategy A Holding Costs & Cash Flow -->
+                    <section class="glass-panel">
+                        <h2>4. Strategy A: Property Expenses & Monthly Cash Flow</h2>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="propAv">Annual Value (AV for IRAS Property Tax)</label>
+                                <span id="propAvVal" class="value-display">$48,000/yr</span>
+                            </div>
+                            <input type="number" id="propAv" value="48000" step="2000">
+                            <span class="sub-label">Estimated market annual rental value used for IRAS Property Tax.</span>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propMcst">Condo MCST / Maintenance ($/mo)</label>
+                                <span id="propMcstVal" class="value-display">$400/mo</span>
+                            </div>
+                            <input type="range" id="propMcst" min="0" max="1500" value="400" step="25">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propMaintenance">Repairs & Sinking Fund ($/mo)</label>
+                                <span id="propMaintenanceVal" class="value-display">$150/mo</span>
+                            </div>
+                            <input type="range" id="propMaintenance" min="0" max="1000" value="150" step="25">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="propInsurance">Property Insurance ($/yr)</label>
+                                <span id="propInsuranceVal" class="value-display">$300/yr</span>
+                            </div>
+                            <input type="range" id="propInsurance" min="0" max="2000" value="300" step="50">
+                        </div>
+
+                        <!-- Dynamic Section based on Usage -->
+                        <div id="investmentFields" class="usage-conditional-section hidden">
+                            <div class="input-group">
+                                <div class="label-row">
+                                    <label for="rentalIncome">Gross Monthly Rental Income ($)</label>
+                                    <span id="rentalIncomeVal" class="value-display">$5,500/mo</span>
+                                </div>
+                                <input type="number" id="rentalIncome" value="5500" step="100">
+                            </div>
+                            <div class="slider-group">
+                                <div class="label-row">
+                                    <label for="vacancyRate">Vacancy Provision (% or mo/yr)</label>
+                                    <span id="vacancyRateVal" class="value-display">4.0%</span>
+                                </div>
+                                <input type="range" id="vacancyRate" min="0" max="15" value="4.0" step="0.5">
+                            </div>
+                            <div class="slider-group">
+                                <div class="label-row">
+                                    <label for="agentFeePct">Agent Commission (% of rent/yr)</label>
+                                    <span id="agentFeePctVal" class="value-display">4.17% (0.5 mo)</span>
+                                </div>
+                                <input type="range" id="agentFeePct" min="0" max="10" value="4.17" step="0.5">
+                            </div>
+                        </div>
+
+                        <div class="tax-summary">
+                            <div class="tax-row">
+                                <span>Monthly Mortgage Payment</span>
+                                <span id="monthlyMortgageDisplay" class="val-highlight highlight-cyan">$6,062/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly IRAS Property Tax</span>
+                                <span id="propTaxMonthlyDisplay" class="val-highlight">$133/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly MCST & Maintenance</span>
+                                <span id="propMcstMonthlyDisplay" class="val-highlight">$550/mo</span>
+                            </div>
+                            <div class="tax-row sub-row">
+                                <span>Total Strategy A Housing Outflow</span>
+                                <span id="netMonthlyPropertyOutflowDisplay" class="val-highlight highlight-purple font-lg">$6,745/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly Income Tax to Pay</span>
+                                <span id="strategyAIncomeTaxDisplay" class="val-highlight text-rose">$759/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly Stock Investment</span>
+                                <span id="strategyAStockDcaDisplay" class="val-highlight highlight-emerald">$3,000/mo</span>
+                            </div>
+                            <div class="tax-row sub-row available-cash-row">
+                                <span>Strategy A Available Monthly Cash</span>
+                                <span id="strategyAAvailableCashDisplay" class="val-highlight highlight-emerald font-lg">+$137/mo</span>
+                            </div>
+                            <span class="sub-label">Cash remaining from your salary after paying Income Tax, CPF, Property Expenses & Monthly Stock Investment.</span>
+                        </div>
+                    </section>
+
+                    <!-- Strategy B: Rent & 100% Invest -->
+                    <section class="glass-panel">
+                        <h2>5. Strategy B: Rent & 100% Invested</h2>
+
+                        <div class="input-group">
+                            <div class="label-row">
+                                <label for="altRentCost">Monthly Living Rent ($/mo)</label>
+                                <span id="altRentCostVal" class="value-display">$4,200/mo</span>
+                            </div>
+                            <input type="number" id="altRentCost" value="4200" step="100">
+                            <span class="sub-label">Rental cost paid by the renter in Strategy B instead of buying a property.</span>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="stockCagr">Stock Market CAGR (% p.a.)</label>
+                                <span id="stockCagrVal" class="value-display">8.0%</span>
+                            </div>
+                            <input type="range" id="stockCagr" min="0" max="15" value="8.0" step="0.1">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="stockDivYield">Stock Dividend Yield (% p.a.)</label>
+                                <span id="stockDivYieldVal" class="value-display">2.0%</span>
+                            </div>
+                            <input type="range" id="stockDivYield" min="0" max="8" value="2.0" step="0.1">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="label-row">
+                                <label for="simTimeline">Forecast Horizon (Years)</label>
+                                <span id="simTimelineVal" class="value-display">30 Years</span>
+                            </div>
+                            <input type="range" id="simTimeline" min="5" max="35" value="30" step="1">
+                        </div>
+
+                        <div class="tax-summary strategy-b-summary">
+                            <div class="tax-row">
+                                <span>Monthly Living Rent</span>
+                                <span id="strategyBRentDisplay" class="val-highlight highlight-cyan font-lg">$4,200/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly Income Tax to Pay</span>
+                                <span id="strategyBIncomeTaxDisplay" class="val-highlight text-rose font-lg">$759/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Monthly Base Investment from Salary</span>
+                                <span id="strategyBBaseDcaDisplay" class="val-highlight">$3,000/mo</span>
+                            </div>
+                            <div class="tax-row">
+                                <span>Rent vs. Buy Monthly Savings (Invested)</span>
+                                <span id="monthlyRentVsBuySavingsDisplay" class="val-highlight text-emerald font-lg">+$2,545/mo</span>
+                            </div>
+                            <div class="tax-row sub-row">
+                                <span>Total Strategy B Monthly Stock DCA</span>
+                                <span id="totalStrategyBMonthlyDcaDisplay" class="val-highlight highlight-cyan font-lg">$5,545/mo</span>
+                            </div>
+                            <div class="tax-row sub-row available-cash-row">
+                                <span>Strategy B Available Monthly Cash</span>
+                                <span id="strategyBAvailableCashDisplay" class="val-highlight highlight-emerald font-lg">+$137/mo</span>
+                            </div>
+                            <span class="sub-label">Cash remaining from salary after paying Income Tax, CPF, Living Rent & Total Stock DCA ($5,545/mo).</span>
+                        </div>
+                    </section>
                 </div>
 
-                <div class="input-group">
-                    <label for="currentSavings">Current Savings ($)</label>
-                    <input type="number" id="currentSavings" value="50000" step="1000">
-                    <input type="range" id="currentSavingsRange" min="0" max="1000000" value="50000" step="5000">
+                <!-- Column 3: Strategy A vs Strategy B Results & Chart -->
+                <div class="prop-col-full">
+                    <section class="glass-panel">
+                        <!-- Top Summary Cards -->
+                        <div class="prop-stats-grid">
+                            <div class="stat-card" id="cardPropNetWorth">
+                                <h3>Strategy A: Buy Property Total AUM (<span class="simYearsLabel">30Y</span>)</h3>
+                                <p id="finalTotalPropAumDisplay" class="stat-value highlight-purple">$0</p>
+                                <span class="stat-sub" id="finalPropEquityAndLiquidSub">Prop Equity: $0 | Remaining Stocks: $0</span>
+                            </div>
+                            <div class="stat-card" id="cardStockNetWorth">
+                                <h3>Strategy B: Rent & Invest Total AUM (<span class="simYearsLabel">30Y</span>)</h3>
+                                <p id="finalStockAumDisplay" class="stat-value highlight-cyan">$0</p>
+                                <span class="stat-sub" id="stockInvestedTotalSub">Starting $1.0M + Base DCA + Rent Savings</span>
+                            </div>
+                            <div class="stat-card highlight-card" id="cardNetWinner">
+                                <h3>Winning Strategy (<span class="simYearsLabel">30Y</span>)</h3>
+                                <p id="winnerDisplay" class="stat-value winner-text">Strategy B by $0</p>
+                                <span class="stat-sub" id="breakevenDisplay">Breakeven: Never</span>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total Sunk Costs (Strategy A)</h3>
+                                <p id="totalSunkCostsDisplay" class="stat-value text-muted-red">$0</p>
+                                <span class="stat-sub" id="sunkCostDetailSub">Interest, Taxes, MCST, Maintenance & Stamp Duties</span>
+                            </div>
+                        </div>
+
+                        <!-- Chart Container -->
+                        <div class="chart-container prop-chart-container">
+                            <canvas id="propertyChart"></canvas>
+                        </div>
+
+                        <!-- Cost & Return Breakdown Metrics -->
+                        <div class="prop-breakdown-row">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Total Mortgage Interest Paid</span>
+                                <span id="totalMortgageInterestDisplay" class="breakdown-val">$0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Total Property Taxes Paid</span>
+                                <span id="totalPropTaxesDisplay" class="breakdown-val">$0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Total MCST & Maintenance</span>
+                                <span id="totalMcstDisplay" class="breakdown-val">$0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Total Stamp Duties (BSD+ABSD)</span>
+                                <span id="totalDutiesDisplay" class="breakdown-val">$0</span>
+                            </div>
+                        </div>
+
+                        <!-- Collapsible Detailed Annual Ledger -->
+                        <div class="table-accordion">
+                            <button type="button" class="btn-accordion" id="toggleLedgerBtn">
+                                <span>📊 View Year-by-Year AUM & Equity Ledger</span>
+                                <span class="accordion-arrow" id="accordionArrow">▼</span>
+                            </button>
+                            <div id="ledgerContainer" class="ledger-container hidden">
+                                <div class="table-wrapper">
+                                    <table class="comparison-table" id="comparisonTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Year</th>
+                                                <th>Property Value</th>
+                                                <th>Remaining Debt</th>
+                                                <th>Property Equity (A)</th>
+                                                <th>Remaining Stocks (A)</th>
+                                                <th>Total AUM (Strategy A: Buy)</th>
+                                                <th>Total AUM (Strategy B: Rent & Invest)</th>
+                                                <th>Net Difference</th>
+                                                <th>Leader</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="comparisonTableBody">
+                                            <!-- Populated dynamically by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-
-                <div class="input-group">
-                    <label for="stockPortfolio">Stock Portfolio ($)</label>
-                    <input type="number" id="stockPortfolio" value="25000" step="1000">
-                    <input type="range" id="stockPortfolioRange" min="0" max="1000000" value="25000" step="5000">
-                </div>
-            </section>
-
-            <section class="tax-panel glass-panel">
-                <h2>Tax & Residency</h2>
-
-                <div class="input-group">
-                    <label for="residencyStatus">Residency Status</label>
-                    <select id="residencyStatus" class="full-select">
-                        <option value="citizen" selected>Singapore Citizen / PR (Year 3+)</option>
-                        <option value="pr2">Permanent Resident (Year 2)</option>
-                        <option value="pr1">Permanent Resident (Year 1)</option>
-                        <option value="foreigner_resident">Foreigner (Tax Resident)</option>
-                        <option value="foreigner_non_resident">Foreigner (Non-Resident)</option>
-                        <option value="director">Non-Resident Director</option>
-                    </select>
-                </div>
-
-                <div class="tax-summary">
-                    <div class="tax-row">
-                        <span>Est. Tax</span>
-                        <span id="estTaxDisplay" class="val-highlight">$0</span>
-                    </div>
-                    <div class="tax-row">
-                        <span>CPF Contribution</span>
-                        <span id="cpfDisplay" class="val-highlight">$0</span>
-                    </div>
-                    <div class="tax-row sub-row">
-                        <span>Effective Tax Rate</span>
-                        <span id="effectiveRateDisplay">0%</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="levers-panel glass-panel">
-                <h2>Growth Levers</h2>
-
-                <div class="slider-group">
-                    <div class="label-row">
-                        <label for="stockReturn">Stock Appreciation</label>
-                        <span id="stockReturnVal" class="value-display">7.0%</span>
-                    </div>
-                    <input type="range" id="stockReturn" min="-10" max="20" value="7.0" step="0.1">
-                </div>
-
-                <div class="slider-group">
-                    <div class="label-row">
-                        <label for="dividendYield">Dividend Yield</label>
-                        <span id="dividendYieldVal" class="value-display">1.5%</span>
-                    </div>
-                    <input type="range" id="dividendYield" min="0" max="10" value="1.5" step="0.1">
-                </div>
-
-                <div class="slider-group">
-                    <div class="label-row">
-                        <label for="annualRaise">Annual Raise</label>
-                        <span id="annualRaiseVal" class="value-display">3.0%</span>
-                    </div>
-                    <input type="range" id="annualRaise" min="0" max="15" value="3.0" step="0.1">
-                </div>
-
-                <div class="slider-group">
-                    <div class="label-row">
-                        <label for="annualBonus">Annual Bonus</label>
-                        <span class="sub-label">(% of Income)</span>
-                        <span id="annualBonusVal" class="value-display">10%</span>
-                    </div>
-                    <input type="range" id="annualBonus" min="0" max="50" value="10" step="1">
-                </div>
-
-                <div class="slider-group">
-                    <div class="label-row">
-                        <label for="cashInterest">Cash Interest</label>
-                        <span id="cashInterestVal" class="value-display">3.0%</span>
-                    </div>
-                    <input type="range" id="cashInterest" min="0" max="10" value="3.0" step="0.1">
-                </div>
-
-                <!-- Expenses Section -->
-                <div class="expenses-section">
-                    <div class="label-row"
-                        style="margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
-                        <label>Monthly Expenses</label>
-                        <span id="totalExpensesDisplay" class="value-display">$0/mo</span>
-                    </div>
-
-                    <div id="expensesList" class="expenses-list">
-                        <!-- Populated by JS -->
-                    </div>
-
-                    <div class="add-expense-row">
-                        <input type="text" id="newExpenseName" placeholder="Name" class="mini-input">
-                        <input type="number" id="newExpenseAmount" placeholder="$" class="mini-input">
-                        <button id="addExpenseBtn" class="btn-add">+</button>
-                    </div>
-                </div>
-            </section>
-
-            <section class="viz-panel glass-panel">
-                <div class="chart-container">
-                    <canvas id="wealthChart"></canvas>
-                </div>
-                <div class="stats-row">
-                    <div class="stat-card">
-                        <h3>Net Worth (10Y)</h3>
-                        <p id="netWorth10y" class="stat-value">$0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Total Saved</h3>
-                        <p id="totalPrincipal" class="stat-value">$0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Investment Growth</h3>
-                        <p id="totalInterest" class="stat-value">$0</p>
-                    </div>
-                    <div class="stat-card highlight-card">
-                        <h3>Cash Balance (Monthly)</h3>
-                        <p id="cashBalanceDisplay" class="stat-value">$0</p>
-                    </div>
-                </div>
-            </section>
-        </main>
+            </main>
+        </div>
     </div>
     <script src="app.js"></script>
 </body>
